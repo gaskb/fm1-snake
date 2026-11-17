@@ -17,7 +17,7 @@ Classic Snake game firmware for the **M-VAVE FM-1** pocket synthesizer, built on
 | `KNOB1` or `SELECT` encoder | Turn left / right (90°) |
 | `OCT−` / `OCT+` | Move Left / Right |
 | `ENV` (or `FX`) / `SEL` (or `LFO`) | Move Up / Down |
-| Keys `C4` / `D4` / `E4` / `F4` (or `F3` / `G3` / `A3` / `B3`) | Move Left / Down / Up / Right |
+| Keys `C` / `D` / `E` / `C#`–`D#` (both octaves) | Move Left / Down / Right / Up |
 
 ## Build
 

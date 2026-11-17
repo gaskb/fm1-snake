@@ -6,7 +6,7 @@
  *     KNOB1 or SELECT encoder    Turn left / right
  *     BTN_OCT- / OCT+            Left / Right
  *     BTN_ENV (or FX) / SEL      Up / Down
- *     Keys C4/D4/E4/F4           Left / Down / Up / Right (great on fm1-live keyboard)
+ *     Keys C / D / E / C#-D#     Left / Down / Right / Up (piano D-pad)
  *
  * Rules of the road (no FPU, no libgcc): integers only, no float, no 64-bit division.
  */
@@ -288,7 +288,7 @@ static void draw_title_screen(void)
     draw_board_frame();
     draw_text_box(16, 56, 208, &FONT_L, "SNAKE", C_HEAD, 1);
     draw_text_box(16, 102, 208, &FONT_S, "FM-1 EDITION  v" APP_VER, C_SNAKE_DIM, 1);
-    draw_text_box(16, 134, 208, &FONT_S, "KNOB1 / KEYS: MOVE", C_WHITE, 1);
+    draw_text_box(16, 134, 208, &FONT_S, "KNOB1 / C-C#-D-E: MOVE", C_WHITE, 1);
     draw_text_box(16, 156, 208, &FONT_S, "OCT-/+ ENV/SEL: DPAD", C_WHITE, 1);
     draw_text_box(16, 190, 208, &FONT_S, "PRESS PLAY TO START", C_GOLD, 1);
 }
@@ -486,11 +486,12 @@ static void app_main(void)
         if (down_btns & ((1u << BTN_ENV) | (1u << BTN_FX)))  queue_dir(DIR_UP);
         if (down_btns & ((1u << BTN_SEL) | (1u << BTN_LFO))) queue_dir(DIR_DOWN);
 
-        /* Keyboard keys: F3/G3/A3/B3 (0,2,4,6) and C4/D4/E4/F4 (7,9,11,12) */
-        if (down_keys & ((1u << 0) | (1u << 7)))  queue_dir(DIR_LEFT);
-        if (down_keys & ((1u << 2) | (1u << 9)))  queue_dir(DIR_DOWN);
-        if (down_keys & ((1u << 4) | (1u << 11))) queue_dir(DIR_UP);
-        if (down_keys & ((1u << 6) | (1u << 12))) queue_dir(DIR_RIGHT);
+        /* Piano D-pad (both octaves C4..E4 and C5..E5):
+         * C = Left (7,19), D = Down (9,21), E = Right (11,23), C#/D# = Up (8,10,20,22) */
+        if (down_keys & ((1u << 7) | (1u << 19))) queue_dir(DIR_LEFT);
+        if (down_keys & ((1u << 9) | (1u << 21))) queue_dir(DIR_DOWN);
+        if (down_keys & ((1u << 11) | (1u << 23))) queue_dir(DIR_RIGHT);
+        if (down_keys & ((1u << 8) | (1u << 10) | (1u << 20) | (1u << 22))) queue_dir(DIR_UP);
 
         if ((uint32_t)(fm1_ms - last_step_ms) >= step_interval_ms()) {
             last_step_ms = fm1_ms;
