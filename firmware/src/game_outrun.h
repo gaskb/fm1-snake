@@ -20,7 +20,7 @@ enum { OR_TITLE = 0, OR_PLAY = 1, OR_PAUSE = 2, OR_OVER = 3 };
 #define OR_CURB_W  RGB(240, 240, 240)
 #define OR_LANE    RGB(235, 235, 210)
 
-#define OR_NCARS 3u
+#define OR_NCARS 1u
 
 static struct {
     int32_t speed;      /* 0..280 (scaled *1 for km/h) */
@@ -55,7 +55,9 @@ static void or_draw_top(void)
     int32_t sx;
     char hud1[16] = "TIME 45  KMH 000";
     char hud2[14] = "SCR 0000";
-    const char *trk = (orun.bgm_mode == 2u) ? "MAGICAL" : (orun.bgm_mode == 3u) ? "BREEZE" : "BGM OFF";
+    const char *trk = (orun.bgm_mode == 2u) ? "MAGICAL" :
+                      (orun.bgm_mode == 3u) ? "BREEZE" :
+                      (orun.bgm_mode == 4u) ? "SPLASH" : "BGM OFF";
 
     cv_begin(240, 120, OR_SKY0);
     cv_rect(0, 30, 240, 30, OR_SKY1);
@@ -396,7 +398,8 @@ static int outrun_tick(uint32_t down_btns, uint32_t down_keys, uint32_t keys_hel
 
     if (down_btns & (1u << BTN_FX)) {
         if (orun.bgm_mode == 2u) orun.bgm_mode = 3u;
-        else if (orun.bgm_mode == 3u) orun.bgm_mode = 0u;
+        else if (orun.bgm_mode == 3u) orun.bgm_mode = 4u;
+        else if (orun.bgm_mode == 4u) orun.bgm_mode = 0u;
         else orun.bgm_mode = 2u;
         if (orun.st == OR_PLAY) bgm_set(orun.bgm_mode);
     }
