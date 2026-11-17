@@ -6,7 +6,8 @@ enum {
     GAME_MENU = 0,
     GAME_SNAKE = 1,
     GAME_TETRIS = 2,
-    GAME_ARKANOID = 3
+    GAME_ARKANOID = 3,
+    GAME_OUTRUN = 4
 };
 
 #define MASK_KEY_C   ((1u << 7)  | (1u << 19))
@@ -19,7 +20,7 @@ static struct {
     uint16_t hi_snake;
     uint16_t hi_tetris;
     uint16_t hi_arkanoid;
-    uint16_t reserved;
+    uint16_t hi_outrun;
 } save_data = {0u, 0u, 0u, 0u};
 
 static uint32_t arcade_rng = 0x12345678u;

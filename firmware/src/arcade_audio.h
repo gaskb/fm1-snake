@@ -46,6 +46,8 @@ static void sfx_turn(void)     { sfx_blip(96u, 14u); }
 static void sfx_paddle(void)   { sfx_blip(72u, 25u); }
 static void sfx_brick(void)    { sfx_blip(84u, 30u); }
 static void sfx_wall(void)     { sfx_blip(60u, 18u); }
+static void sfx_crash(void)    { static const uint8_t n[4] = {48u, 45u, 42u, 38u}; sfx_trigger(n, 4u, 70u); }
+static void sfx_check(void)    { static const uint8_t n[4] = {76u, 79u, 83u, 88u}; sfx_trigger(n, 4u, 55u); }
 
 /* ---- Tetris Korobeiniki BGM (melody + bass) ---- */
 typedef struct { uint8_t mel; uint8_t bass; uint8_t beats; } bgm_step_t;
@@ -72,18 +74,46 @@ static const bgm_step_t TETRIS_BGM[] = {
 #define TETRIS_BGM_LEN (sizeof(TETRIS_BGM) / sizeof(TETRIS_BGM[0]))
 #define BGM_EIGHTH_FRAMES (8200u)
 
-static volatile uint8_t bgm_enabled = 0;
+/* OutRun: Magical Sound Shower (upbeat Latin-synth lead + funky bass) */
+static const bgm_step_t OUTRUN_MAGICAL[] = {
+    /* Phrase A: D5 F5 A5 G5 F5 D5 C5 D5 */
+    {74, 38, 2}, {77, 50, 1}, {81, 38, 2}, {79, 50, 1}, {77, 38, 1}, {74, 50, 1},
+    {72, 36, 2}, {74, 48, 2}, {77, 36, 2}, {74, 48, 2},
+    /* Phrase B: Bb4 D5 F5 E5 D5 C5 A4 C5 */
+    {70, 34, 2}, {74, 46, 1}, {77, 34, 2}, {76, 46, 1}, {74, 34, 1}, {72, 46, 1},
+    {69, 33, 2}, {72, 45, 2}, {76, 33, 2}, {74, 45, 2},
+    /* Phrase C: G5 F5 E5 D5 C5 Bb4 A4 G4 */
+    {79, 43, 2}, {77, 55, 1}, {76, 43, 1}, {74, 55, 2}, {72, 43, 1}, {70, 55, 1},
+    {69, 41, 2}, {67, 53, 2}, {69, 41, 2}, {72, 53, 2},
+    /* Turnaround: A4 C5 D5 E5 F5 G5 A5 . */
+    {69, 45, 1}, {72, 45, 1}, {74, 57, 1}, {76, 45, 1}, {77, 57, 1}, {79, 45, 1}, {81, 57, 2},
+    {81, 45, 2}, {0,  57, 2}, {79, 45, 2}, {76, 57, 2},
+};
+#define OUTRUN_MAGICAL_LEN (sizeof(OUTRUN_MAGICAL) / sizeof(OUTRUN_MAGICAL[0]))
+
+/* OutRun: Passing Breeze (chill coastal synth-pop) */
+static const bgm_step_t OUTRUN_BREEZE[] = {
+    {76, 40, 2}, {79, 52, 2}, {83, 40, 2}, {81, 52, 2},
+    {79, 38, 2}, {76, 50, 2}, {74, 38, 4},
+    {72, 36, 2}, {76, 48, 2}, {79, 36, 2}, {78, 48, 2},
+    {76, 40, 3}, {74, 52, 1}, {71, 40, 4},
+    {74, 43, 2}, {77, 55, 2}, {81, 43, 2}, {79, 55, 2},
+    {77, 41, 2}, {74, 53, 2}, {72, 41, 4},
+    {71, 40, 2}, {74, 52, 2}, {76, 40, 2}, {79, 52, 2},
+    {76, 40, 4}, {0,  52, 4},
+};
+#define OUTRUN_BREEZE_LEN (sizeof(OUTRUN_BREEZE) / sizeof(OUTRUN_BREEZE[0]))
+
+static volatile uint8_t bgm_enabled = 0; /* 0=off, 1=Tetris, 2=Magical, 3=Breeze */
 static uint32_t bgm_idx = 0, bgm_rem = 0;
 static uint32_t bgm_ph1 = 0, bgm_inc1 = 0, bgm_ph2 = 0, bgm_inc2 = 0;
 static int32_t bgm_env1 = 0, bgm_env2 = 0;
 
-static void bgm_set(uint8_t on)
+static void bgm_set(uint8_t song)
 {
-    bgm_enabled = on;
-    if (on) {
-        bgm_idx = 0u;
-        bgm_rem = 0u;
-    }
+    bgm_enabled = song;
+    bgm_idx = 0u;
+    bgm_rem = 0u;
 }
 
 static void app_audio(int32_t *out, uint32_t n)
@@ -128,16 +158,22 @@ static void app_audio(int32_t *out, uint32_t n)
             mix += (sq * sfx_amp) >> 15;
         }
 
-        /* 2. BGM channel (Tetris Korobeiniki) */
+        /* 2. BGM channel */
         if (bgm_enabled) {
             if (bgm_rem == 0u) {
-                const bgm_step_t *st = &TETRIS_BGM[bgm_idx];
+                const bgm_step_t *tbl = TETRIS_BGM;
+                uint32_t len = TETRIS_BGM_LEN;
+                uint32_t frame_unit = BGM_EIGHTH_FRAMES;
+                if (bgm_enabled == 2u) { tbl = OUTRUN_MAGICAL; len = OUTRUN_MAGICAL_LEN; frame_unit = 6800u; }
+                else if (bgm_enabled == 3u) { tbl = OUTRUN_BREEZE; len = OUTRUN_BREEZE_LEN; frame_unit = 7600u; }
+                if (bgm_idx >= len) bgm_idx = 0u;
+                const bgm_step_t *st = &tbl[bgm_idx];
                 bgm_inc1 = note_inc(st->mel);
                 bgm_inc2 = note_inc(st->bass);
-                bgm_rem = (uint32_t)st->beats * BGM_EIGHTH_FRAMES;
+                bgm_rem = (uint32_t)st->beats * frame_unit;
                 bgm_env1 = st->mel ? 3800 : 0;
                 bgm_env2 = st->bass ? 2800 : 0;
-                bgm_idx = (bgm_idx + 1u) % TETRIS_BGM_LEN;
+                bgm_idx = (bgm_idx + 1u) % len;
             }
             bgm_rem--;
             if (bgm_rem < 400u) {

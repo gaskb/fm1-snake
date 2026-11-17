@@ -1,12 +1,13 @@
 # FM-1 Arcade (`fm1-snake`)
 
-3-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
+4-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
 
 ## Games Included
 
 1. **Snake** — 19×17 grid, directional eyes, progressive speed, chiptune SFX, persistent high score.
 2. **Tetris** — Classic 10×20 board, all 7 tetrominoes with wall kicks, NEXT preview, **Korobeiniki 2-voice chiptune BGM** (`FX` toggles music), hard drop (`F` / `REC`).
 3. **Arkanoid** — 5×9 colored bricks, smooth Q8 fixed-point physics, **rotary paddle control via `KNOB1` / `SELECT`**, 3 lives, level progression.
+4. **OutRun** — Pseudo-3D raster road racer with sunset parallax, palm trees, traffic cars, checkpoints, and **Magical Sound Shower / Passing Breeze** chiptune BGM (`FX` cycles radio).
 
 All high scores are saved to flash (`STORE_MAGIC = "SNK1"`). Press **`HOME`** from any game to return to the Arcade menu.
 
