@@ -1,13 +1,17 @@
 # FM-1 Arcade (`fm1-snake`)
 
-4-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
+8-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
 
 ## Games Included
 
 1. **Snake** — 19×17 grid, directional eyes, progressive speed, chiptune SFX, persistent high score.
 2. **Tetris** — Classic 10×20 board, all 7 tetrominoes with wall kicks, NEXT preview, **Korobeiniki 2-voice chiptune BGM** (`FX` toggles music), hard drop (`F` / `REC`).
 3. **Arkanoid** — 5×9 colored bricks, smooth Q8 fixed-point physics, **rotary paddle control via `KNOB1` / `SELECT`**, 3 lives, level progression.
-4. **OutRun** — Pseudo-3D raster road racer with sunset parallax, palm trees, traffic cars, checkpoints, and **Magical Sound Shower / Passing Breeze** chiptune BGM (`FX` cycles radio).
+4. **OutRun** — Pseudo-3D raster road racer with sunset parallax, palm trees, traffic car, checkpoints, and **Magical Sound Shower / Passing Breeze / Splash Wave** 4-voice FM + drums BGM (`FX` cycles radio).
+5. **Synth Hero** — Guitar Hero-style rhythm game synced to the OutRun MIDI tracks! **BASE** mode (7 white keys `C..B`) & **HIGH** mode (12 chromatic keys including `#`/`b`).
+6. **Frogger** — Classic 13-row road & river crossing with 5 home lilypads.
+7. **Galaga** — Scrolling starfield, swaying alien formation, dive-bombers, twin-laser starfighter.
+8. **Pac-Man** — 19×19 maze, dots, blinking power pellets, 4 colored ghosts.
 
 All high scores are saved to flash (`STORE_MAGIC = "SNK1"`). Press **`HOME`** from any game to return to the Arcade menu.
 
