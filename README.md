@@ -1,33 +1,40 @@
-# FM-1 Snake
+# FM-1 Arcade (`fm1-snake`)
 
-Classic Snake game firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
+3-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
 
-## Features
+## Games Included
 
-- **240×240 incremental display**: 19×17 grid, directional eyes on the snake head, score & high-score HUD.
-- **Chiptune sound effects**: synthesized square/pulse SFX in real time (`app_audio`) for start, turns, eating food, and game over.
-- **Persistent high score**: saved in flash (`settings_save` with `STORE_MAGIC = "SNK1"`).
-- **USB rescue**: hold **OCT−** at power-on to enter the updater if needed.
+1. **Snake** — 19×17 grid, directional eyes, progressive speed, chiptune SFX, persistent high score.
+2. **Tetris** — Classic 10×20 board, all 7 tetrominoes with wall kicks, NEXT preview, **Korobeiniki 2-voice chiptune BGM** (`FX` toggles music), hard drop (`F` / `REC`).
+3. **Arkanoid** — 5×9 colored bricks, smooth Q8 fixed-point physics, **rotary paddle control via `KNOB1` / `SELECT`**, 3 lives, level progression.
+
+All high scores are saved to flash (`STORE_MAGIC = "SNK1"`). Press **`HOME`** from any game to return to the Arcade menu.
 
 ## Controls
 
-| Input | Action |
-| --- | --- |
-| `PLAY` | Start / Pause / Restart |
-| `KNOB1` or `SELECT` encoder | Turn left / right (90°) |
-| `OCT−` / `OCT+` | Move Left / Right |
-| `ENV` (or `FX`) / `SEL` (or `LFO`) | Move Up / Down |
-| Keys `C` / `D` / `E` / `C#`–`D#` (both octaves) | Move Left / Down / Right / Up |
+| Context | Input | Action |
+| --- | --- | --- |
+| **Menu** | `KNOB1` / `SELECT` / `C#` / `D` | Select game |
+| **Menu** | `PLAY` / `E` / `F` | Launch game |
+| **Snake** | `C` / `D` / `E` / `C#`–`D#` | Left / Down / Right / Up |
+| **Snake** | `KNOB1` / `SELECT` | Turn left / right (90°) |
+| **Tetris** | `C` / `E` / `D` | Move Left / Right / Soft Drop |
+| **Tetris** | `C#`–`D#` / `KNOB1` | Rotate |
+| **Tetris** | `F` / `REC` | Hard Drop |
+| **Tetris** | `FX` | Toggle BGM (Korobeiniki) |
+| **Arkanoid** | `KNOB1` / `SELECT` (or `C`/`E`) | Move paddle |
+| **Arkanoid** | `PLAY` / `C#` / `F` | Launch ball / Pause |
+| **Any game** | `HOME` | Return to Arcade menu |
 
 ## Build
 
 Requires Docker (on macOS/Windows) or Linux x86-64, the JieLi toolchain (`./tools/get_toolchain.sh`), and `fw-AC79_AIoT_SDK`:
 
 ```sh
-JIELI_TOOLCHAIN="$HOME/.jieli/toolchain" AC79_SDK="$HOME/fw-AC79_AIoT_SDK" ./build.sh --release 0.1
+JIELI_TOOLCHAIN="$HOME/.jieli/toolchain" AC79_SDK="$HOME/fw-AC79_AIoT_SDK" ./build.sh --release 0.3
 ```
 
-Output package: `build/fm1-snake-0.1.fwsc` (identity `FM-1_961`).
+Output package: `build/fm1-snake-0.3.fwsc` (identity `FM-1_963`).
 
 ## Credits & License
 
