@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* FM-1 Arcade (8-in-1): Snake, Tetris, Arkanoid, OutRun, Synth Hero, Frogger, Galaga, Pac-Man.
+/* FM-1 Arcade (10-in-1): Snake, Tetris, Arkanoid, OutRun, Synth Hero, Frogger, Galaga, Pac-Man, Dino Run, Flappy Bird.
  * Built on Dinghy (Felucca / SLOOP platform).
  *
  * Rules of the road (no FPU, no libgcc): integers only, no float, no 64-bit division.
@@ -20,13 +20,15 @@ static void app_idle(void);
 #include "game_frogger.h"
 #include "game_galaga.h"
 #include "game_pacman.h"
+#include "game_dino.h"
+#include "game_flappy.h"
 
 static void app_idle(void)
 {
     /* Keep DMA fast; polling happens in app_main */
 }
 
-#define NUM_GAMES 8u
+#define NUM_GAMES 10u
 static uint8_t current_game = GAME_MENU;
 static uint8_t menu_sel = 0u;
 static uint8_t menu_top = 0u;
@@ -35,7 +37,8 @@ static void draw_menu(void)
 {
     static const char *const NAMES[NUM_GAMES] = {
         "1. SNAKE", "2. TETRIS", "3. ARKANOID", "4. OUTRUN",
-        "5. SYNTH HERO", "6. FROGGER", "7. GALAGA", "8. PAC-MAN"
+        "5. SYNTH HERO", "6. FROGGER", "7. GALAGA", "8. PAC-MAN",
+        "9. DINO RUN", "10. FLAPPY"
     };
     static const uint16_t COLS[NUM_GAMES] = {
         RGB(110, 255, 120),
@@ -45,7 +48,9 @@ static void draw_menu(void)
         RGB(255, 90, 210),
         RGB(80, 255, 100),
         RGB(100, 220, 255),
-        RGB(255, 230, 40)
+        RGB(255, 230, 40),
+        RGB(160, 240, 160),
+        RGB(255, 220, 50)
     };
     uint32_t row;
     uint16_t his[NUM_GAMES];
@@ -57,6 +62,8 @@ static void draw_menu(void)
     his[5] = save_data.hi_frogger;
     his[6] = save_data.hi_galaga;
     his[7] = save_data.hi_pacman;
+    his[8] = save_data.hi_dino;
+    his[9] = save_data.hi_flappy;
 
     if (menu_sel < menu_top) menu_top = menu_sel;
     if (menu_sel >= menu_top + 4u) menu_top = (uint8_t)(menu_sel - 3u);
@@ -65,7 +72,7 @@ static void draw_menu(void)
     fm1_led_key(BTN_PLAY, 0);
     lcd_fill(0, 0, 240, 240, C_BLACK);
     draw_text_box(12, 10, 216, &FONT_L, "ARCADE", RGB(255, 215, 70), 1);
-    draw_text_box(12, 44, 216, &FONT_S, "FM-1 8-IN-1  v" APP_VER, RGB(130, 145, 160), 1);
+    draw_text_box(12, 44, 216, &FONT_S, "FM-1 10-IN-1  v" APP_VER, RGB(130, 145, 160), 1);
 
     for (row = 0u; row < 4u; row++) {
         uint32_t idx = menu_top + row;
@@ -82,7 +89,7 @@ static void draw_menu(void)
 
     /* Simple scroll indicator on right edge */
     lcd_fill(224, 66, 4, 139, RGB(25, 30, 42));
-    lcd_fill(224, 66 + (int32_t)menu_top * 22, 4, 50, RGB(120, 145, 190));
+    lcd_fill(224, 66 + (int32_t)menu_top * 16, 4, 42, RGB(120, 145, 190));
 
     draw_text_box(12, 216, 216, &FONT_S, "KNOB1/C#-D: PICK  PLAY: GO", RGB(150, 165, 185), 1);
 }
@@ -96,7 +103,9 @@ static void launch_game(uint8_t sel)
     else if (sel == 4u) { current_game = GAME_HERO;     hero_enter(); }
     else if (sel == 5u) { current_game = GAME_FROGGER;  frogger_enter(); }
     else if (sel == 6u) { current_game = GAME_GALAGA;   galaga_enter(); }
-    else                { current_game = GAME_PACMAN;   pacman_enter(); }
+    else if (sel == 7u) { current_game = GAME_PACMAN;   pacman_enter(); }
+    else if (sel == 8u) { current_game = GAME_DINO;     dino_enter(); }
+    else                { current_game = GAME_FLAPPY;   flappy_enter(); }
 }
 
 static void app_main(void)
@@ -107,11 +116,13 @@ static void app_main(void)
         save_data.hi_snake > 999u || save_data.hi_tetris > 9999u ||
         save_data.hi_arkanoid > 9999u || save_data.hi_outrun > 9999u ||
         save_data.hi_hero > 9999u || save_data.hi_frogger > 9999u ||
-        save_data.hi_galaga > 9999u || save_data.hi_pacman > 9999u) {
+        save_data.hi_galaga > 9999u || save_data.hi_pacman > 9999u ||
+        save_data.hi_dino > 9999u || save_data.hi_flappy > 9999u) {
         save_data.hi_snake = 0u; save_data.hi_tetris = 0u;
         save_data.hi_arkanoid = 0u; save_data.hi_outrun = 0u;
         save_data.hi_hero = 0u; save_data.hi_frogger = 0u;
         save_data.hi_galaga = 0u; save_data.hi_pacman = 0u;
+        save_data.hi_dino = 0u; save_data.hi_flappy = 0u;
     }
 
     current_game = GAME_MENU;
@@ -162,6 +173,10 @@ static void app_main(void)
             if (galaga_tick(down_btns, down_keys, keys, fm1_in.buttons, turn)) { current_game = GAME_MENU; draw_menu(); }
         } else if (current_game == GAME_PACMAN) {
             if (pacman_tick(down_btns, down_keys, turn)) { current_game = GAME_MENU; draw_menu(); }
+        } else if (current_game == GAME_DINO) {
+            if (dino_tick(down_btns, down_keys, keys, fm1_in.buttons, turn)) { current_game = GAME_MENU; draw_menu(); }
+        } else if (current_game == GAME_FLAPPY) {
+            if (flappy_tick(down_btns, down_keys, turn)) { current_game = GAME_MENU; draw_menu(); }
         }
     }
 }

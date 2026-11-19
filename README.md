@@ -1,6 +1,6 @@
 # FM-1 Arcade (`fm1-snake`)
 
-8-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
+10-in-1 Arcade firmware for the **M-VAVE FM-1** pocket synthesizer, built on [Dinghy](https://github.com/zvenson/dinghy) (Felucca / SLOOP platform).
 
 ## Games Included
 
@@ -12,6 +12,8 @@
 6. **Frogger** — Classic 13-row road & river crossing with 5 home lilypads.
 7. **Galaga** — Scrolling starfield, swaying alien formation, dive-bombers, twin-laser starfighter.
 8. **Pac-Man** — 19×19 maze, dots, blinking power pellets, 4 colored ghosts.
+9. **Dino Run** — Chrome offline T-Rex runner with jumping, ducking, cacti, pterodactyls, and day/night cycles.
+10. **Flappy Bird** — Classic pipe-dodging flyer with pentatonic synth notes on every flap.
 
 All high scores are saved to flash (`STORE_MAGIC = "SNK1"`). Press **`HOME`** from any game to return to the Arcade menu.
 
